@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -41,91 +41,90 @@ const cardValues = [
   },
 ];
 
-const cardsWithDummy =
-  cardValues.length % 2 === 0
-    ? cardValues
-    : [...cardValues, { key: "dummy", BgColor: "transparent" }];
-
 const Cards = ({ userId, onSelect, setShowCards }) => {
-  const renderCard = ({ item }) => {
-    // Handle the dummy card
-    if (item.key === "dummy") {
-      return <View style={[styles.card, { backgroundColor: item.BgColor }]} />;
-    }
-
-    return (
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: item.BgColor }]}
-        onPress={() => onSelect(userId, item.key)}
-      >
-        <Text style={[styles.cardText, { color: item.textColor }]}>
-          {item.label}
-        </Text>
-      </TouchableOpacity>
-    );
+  const [showThankYou, setShowThankYou] = useState(false);
+  const closeCards = () => {
+    setShowCards(false);
   };
   return (
-    <Modal transparent={true} animationType="slide" visible={true}>
-      <View style={styles.modalView}>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>←</Text>
-        </TouchableOpacity>
+    <Modal
+      transparent={true}
+      animationType="slide"
+      visible={true}
+      onRequestClose={closeCards} // Android requires this
+    >
+      <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerText}>AVIS</Text>
+          <TouchableOpacity style={styles.closeButton} onPress={closeCards}>
+            <Text style={styles.closeButtonText}>←</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.cardContainer}>
-          {cardsWithDummy.map((card) => renderCard({ item: card }))}
-        </View>
+        {cardValues.map((card) => (
+          <TouchableOpacity
+            key={card.key}
+            style={[styles.card, { backgroundColor: card.BgColor }]}
+            onPress={() => onSelect(userId, card.key)}
+          >
+            <Text style={[styles.cardText, { color: card.textColor }]}>
+              {card.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  modalView: {
+  container: {
+    display: "flex",
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
+    flexWrap: "wrap",
+    flexDirection: "row",
+    paddingTop: 150,
   },
   header: {
-    backgroundColor: "red",
+    position: "absolute",
+    top: 0,
     width: "100%",
-    padding: 20,
-    alignItems: "center",
+    backgroundColor: "red",
+    padding: 15,
+    zIndex: 1,
   },
   headerText: {
+    textAlign: "left",
     color: "white",
-    fontSize: 24,
+    fontSize: 35,
     fontWeight: "bold",
-  },
-  cardContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    alignItems: "center",
   },
   card: {
     margin: 10,
-    width: "45%", // Adjust this value to account for the margin
-    aspectRatio: 1,
+    padding: 20,
+    width: 250,
+    height: 250,
     justifyContent: "center",
     alignItems: "center",
   },
   cardText: {
-    fontSize: 18,
-    fontWeight: "bold",
     textAlign: "center",
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   closeButton: {
     position: "absolute",
-    top: 20,
+    top: -20,
     right: 20,
     padding: 10,
     zIndex: 1,
   },
   closeButtonText: {
-    fontSize: 24,
+    fontSize: 54,
+    fontWeight: "bold",
     color: "white",
   },
 });

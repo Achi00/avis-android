@@ -102,3 +102,41 @@ export const cardStyles = StyleSheet.create({
     color: "white", // Make sure the text is visible
   },
 });
+
+const thankYouStyles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background to cover the whole screen
+    position: "absolute", // Ensure the view is over everything else
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  thankYouModal: {
+    width: "100%", // Take up the full width
+    height: "100%", // Take up the full height
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)", // A semi-transparent background for the modal itself, if needed
+  },
+  thankYouText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 20,
+  },
+  thankYouButton: {
+    backgroundColor: "#2196F3", // Example button color
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  thankYouButtonText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+});

@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Modal,
 } from "react-native";
-import { styles, cardStyles } from "../styles/index";
+import { styles, cardStyles, thankYouStyles } from "../styles/index";
 import Cards from "./Cards";
 
 const TableHeader = () => (
@@ -41,6 +42,8 @@ const DataTable = () => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [showThankYou, setShowThankYou] = useState(false);
+
   const [showCards, setShowCards] = useState(false);
   // search
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -98,6 +101,12 @@ const DataTable = () => {
     // Handle card selection logic
     console.log("Card Selected", `User ID: ${userId}, Value: ${value}`);
     setShowCards(false);
+    setShowThankYou(true);
+  };
+
+  // Close the thank you modal
+  const closeThankYouModal = () => {
+    setShowThankYou(false);
   };
 
   if (loading) {
@@ -114,7 +123,7 @@ const DataTable = () => {
           style={styles.searchInput}
           placeholder="Search..."
           value={searchText}
-          onChangeText={setSearchText}
+          onChangeText={handleSearchChange}
         />
       </View>
       <TableHeader />
@@ -134,17 +143,46 @@ const DataTable = () => {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
       {showCards && selectedUserId && (
-        <View style={cardStyles.container}>
-          <Cards
-            userId={selectedUserId}
-            setShowCards={setShowCards}
-            onSelect={handleCardSelect}
-          />
-          {/* <Text>Nadasdasdsadsme</Text> */}
-        </View>
+        <Cards
+          userId={selectedUserId}
+          setShowCards={setShowCards}
+          onSelect={handleCardSelect}
+        />
       )}
+      <ThankYouModal visible={showThankYou} onClose={closeThankYouModal} />
     </SafeAreaView>
   );
 };
 
 export default DataTable;
+
+const ThankYouModal = ({ visible, onClose }) => {
+  return (
+    <SafeAreaView>
+      <Modal
+        transparent={true}
+        visible={visible}
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <View style={thankYouStyles.centeredView}>
+          <View style={thankYouStyles.thankYouModal}>
+            <TouchableOpacity
+              style={thankYouStyles.thankYouModal}
+              onPress={onClose}
+              activeOpacity={1}
+            >
+              <Text style={thankYouStyles.thankYouText}>Thank You!</Text>
+              <TouchableOpacity
+                style={thankYouStyles.thankYouButton}
+                onPress={onClose}
+              >
+                <Text style={thankYouStyles.thankYouButtonText}>Close</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+};
