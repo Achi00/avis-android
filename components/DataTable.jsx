@@ -8,18 +8,8 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-
-// Mocking a simplified Cards component
-const Cards = ({ userId, onSelect }) => {
-  // Placeholder for card selection logic
-  return (
-    <View style={styles.row}>
-      <Text style={[styles.cell, styles.name]}>{name}</Text>
-      <Text style={[styles.cell, styles.division]}>{division}</Text>
-      <Text style={[styles.cell, styles.location]}>{location}</Text>
-    </View>
-  );
-};
+import { styles, cardStyles } from "../styles/index";
+import Cards from "./Cards";
 
 const TableHeader = () => (
   <View style={styles.headerRow}>
@@ -101,11 +91,12 @@ const DataTable = () => {
   const handleRowClick = (userId) => {
     setSelectedUserId(userId);
     setShowCards(true);
+    console.log("clicked");
   };
 
   const handleCardSelect = (userId, value) => {
     // Handle card selection logic
-    Alert.alert("Card Selected", `User ID: ${userId}, Value: ${value}`);
+    console.log("Card Selected", `User ID: ${userId}, Value: ${value}`);
     setShowCards(false);
   };
 
@@ -126,88 +117,34 @@ const DataTable = () => {
           onChangeText={setSearchText}
         />
       </View>
+      <TableHeader />
 
       <FlatList
-        data={filteredUsers} // Use filteredUsers here
+        data={filteredUsers}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <>
-            <TableHeader />
+          <TouchableOpacity onPress={() => handleRowClick(item.id)}>
             <UserRow
               name={item.name}
               division={item.division}
               location={item.location}
             />
-          </>
+          </TouchableOpacity>
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
+      {showCards && selectedUserId && (
+        <View style={cardStyles.container}>
+          <Cards
+            userId={selectedUserId}
+            setShowCards={setShowCards}
+            onSelect={handleCardSelect}
+          />
+          {/* <Text>Nadasdasdsadsme</Text> */}
+        </View>
+      )}
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  fullscreen: {
-    // position: "absolute",
-    width: "100%",
-    height: "100vh",
-    backgroundColor: "#e1ded9",
-    flex: 1,
-  },
-  header: {
-    backgroundColor: "red",
-    padding: 20,
-  },
-  headerText: {
-    color: "white",
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  searchContainer: {
-    alignItems: "center",
-    padding: 8, // or adjust to your preference
-  },
-  searchInput: {
-    height: 40,
-    marginHorizontal: 12,
-    marginVertical: 8,
-    borderWidth: 1,
-    padding: 10,
-    width: "50%",
-    borderRadius: 10,
-    borderColor: "grey",
-    backgroundColor: "#fff",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 15,
-    alignItems: "center",
-  },
-  cell: {
-    flex: 1, // Each cell will take up an equal amount of space
-    fontSize: 16,
-    color: "black",
-    padding: 4, // Add padding as needed
-  },
-  name: {
-    flex: 2, // Allocate more space for the name, if desired
-  },
-  division: {
-    flex: 1,
-  },
-  location: {
-    flex: 1,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "#CCCCCC",
-  },
-  loading: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
 export default DataTable;
