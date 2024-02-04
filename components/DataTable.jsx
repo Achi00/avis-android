@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import {
   View,
   Text,
@@ -14,19 +14,19 @@ import Cards from "./Cards";
 
 const TableHeader = () => (
   <View style={styles.headerRow}>
-    <Text style={[styles.headerCell, styles.nameHeader]}>Name</Text>
-    <Text style={[styles.headerCell, styles.divisionHeader]}>Division</Text>
-    <Text style={[styles.headerCell, styles.locationHeader]}>Location</Text>
+    <Text style={[styles.headerCell, styles.nameHeader]}>Ονοματεπώνυμο</Text>
+    <Text style={[styles.headerCell, styles.divisionHeader]}>Διεύθυνση</Text>
+    <Text style={[styles.headerCell, styles.locationHeader]}>Τοποθεσία</Text>
   </View>
 );
 
-const UserRow = ({ name, division, location }) => (
+const UserRow = memo(({ name, division, location }) => (
   <View style={styles.row}>
     <Text style={styles.cell}>{name}</Text>
     <Text style={styles.cell}>{division}</Text>
     <Text style={styles.cell}>{location}</Text>
   </View>
-);
+));
 
 const debounce = (func, delay) => {
   let inDebounce;
@@ -91,23 +91,74 @@ const DataTable = () => {
     setSearchText(text);
   };
 
-  const handleRowClick = (userId) => {
+  const handleRowClick = useCallback((userId) => {
     setSelectedUserId(userId);
     setShowCards(true);
-    console.log("clicked");
-  };
-
-  const handleCardSelect = (userId, value) => {
-    // Handle card selection logic
-    console.log("Card Selected", `User ID: ${userId}, Value: ${value}`);
-    setShowCards(false);
-    setShowThankYou(true);
-  };
+  }, []);
 
   // Close the thank you modal
   const closeThankYouModal = () => {
     setShowThankYou(false);
   };
+
+  // update value in database after user chooses card
+  const handleCardSelect = async (userId, cardValue) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://192.168.100.198:8080/users/${userId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ value: cardValue }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Clone the response before reading it
+      const clonedResponse = response.clone();
+
+      // Now you can read the response text for logging
+      const responseText = await clonedResponse.text();
+
+      // And you can still read the response as JSON afterward
+      const updatedUser = await response.json();
+
+      // Update the client-side state
+      const updatedUsers = users.map((user) =>
+        user.id === userId ? { ...user, ...updatedUser } : user
+      );
+      setUsers(updatedUsers);
+
+      setShowThankYou(true); // Show the thank you message
+    } catch (error) {
+      console.error("Error updating interest:", error);
+      // Handle the error, e.g., show an alert or set an error state
+    }
+    setLoading(false);
+    setShowCards(false); // Hide the cards component regardless of the outcome
+  };
+
+  const renderItem = useCallback(
+    ({ item }) => {
+      const handlePress = () => handleRowClick(item.id);
+      return (
+        <TouchableOpacity onPress={handlePress}>
+          <UserRow
+            name={item.name}
+            division={item.division}
+            location={item.location}
+          />
+        </TouchableOpacity>
+      );
+    },
+    [handleRowClick]
+  );
 
   if (loading) {
     return <Text style={styles.loading}>Loading...</Text>;
@@ -131,17 +182,13 @@ const DataTable = () => {
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleRowClick(item.id)}>
-            <UserRow
-              name={item.name}
-              division={item.division}
-              location={item.location}
-            />
-          </TouchableOpacity>
-        )}
+        renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+        initialNumToRender={10} // Adjust based on your needs
+        maxToRenderPerBatch={10} // Adjust based on your needs
+        windowSize={5} // Adjust based on your needs
       />
+
       {showCards && selectedUserId && (
         <Cards
           userId={selectedUserId}
@@ -157,18 +204,18 @@ const DataTable = () => {
 export default DataTable;
 
 const ThankYouModal = ({ visible, onClose }) => {
-  // useEffect(() => {
-  //   let timer;
-  //   if (visible) {
-  //     // Set a timer for 5 seconds
-  //     timer = setTimeout(() => {
-  //       onClose(); // Call the onClose function after 5 seconds
-  //     }, 5000);
-  //   }
+  useEffect(() => {
+    let timer;
+    if (visible) {
+      // Set a timer for 5 seconds
+      timer = setTimeout(() => {
+        onClose(); // Call the onClose function after 5 seconds
+      }, 5000);
+    }
 
-  //   // Clean up the timer if the component unmounts or if visible changes
-  //   return () => clearTimeout(timer);
-  // }, [visible, onClose]);
+    // Clean up the timer if the component unmounts or if visible changes
+    return () => clearTimeout(timer);
+  }, [visible, onClose]);
   return (
     <SafeAreaView>
       <Modal
@@ -178,27 +225,19 @@ const ThankYouModal = ({ visible, onClose }) => {
         onRequestClose={onClose}
       >
         <View style={thankYouStyles.centeredView}>
-          <View style={thankYouStyles.thankYouModal}>
-            <View style={thankYouStyles.thankYouHeader}>
-              <Text style={thankYouStyles.thankYouHeaderText}>AVIS</Text>
-              <TouchableOpacity onPress={onClose}>
-                <Text style={thankYouStyles.thankYouButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity
-              style={thankYouStyles.thankYouModal}
-              onPress={onClose}
-              activeOpacity={1}
-            >
-              <Text style={thankYouStyles.thankYouText}>Thank You</Text>
-              <TouchableOpacity
-                style={thankYouStyles.thankYouButton}
-                onPress={onClose}
-              >
-                <Text style={thankYouStyles.thankYouButtonText}>Close</Text>
-              </TouchableOpacity>
+          <View style={thankYouStyles.thankYouHeader}>
+            <Text style={thankYouStyles.thankYouHeaderText}>AVIS</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={thankYouStyles.thankYouButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
+          <Text style={thankYouStyles.thankYouText}>Thank You!</Text>
+          <TouchableOpacity
+            style={thankYouStyles.thankYouButton}
+            onPress={onClose}
+          >
+            <Text style={thankYouStyles.thankYouButtonText}>Close</Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     </SafeAreaView>

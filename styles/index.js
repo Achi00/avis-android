@@ -145,14 +145,14 @@ export const thankYouStyles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: "red",
-    padding: 16,
+    padding: 20,
     flexDirection: "row", // Aligns children (text and button) in a row
     justifyContent: "space-between", // Puts space between the text and the button
     alignItems: "center", // Centers items vertically
   },
   thankYouHeaderText: {
     color: "white",
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
   },
 });
