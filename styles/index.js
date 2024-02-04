@@ -103,12 +103,12 @@ export const cardStyles = StyleSheet.create({
   },
 });
 
-const thankYouStyles = StyleSheet.create({
+export const thankYouStyles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background to cover the whole screen
+    backgroundColor: "#fff", // Semi-transparent background to cover the whole screen
     position: "absolute", // Ensure the view is over everything else
     top: 0,
     left: 0,
@@ -120,23 +120,39 @@ const thankYouStyles = StyleSheet.create({
     height: "100%", // Take up the full height
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)", // A semi-transparent background for the modal itself, if needed
+    backgroundColor: "#fff", // A semi-transparent background for the modal itself, if needed
   },
   thankYouText: {
-    fontSize: 24,
+    fontSize: 60,
     fontWeight: "bold",
-    color: "white",
+    color: "black",
     marginBottom: 20,
   },
   thankYouButton: {
-    backgroundColor: "#2196F3", // Example button color
+    backgroundColor: "#d4002a", // Example button color
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 20,
+    borderRadius: 10,
   },
   thankYouButtonText: {
     color: "white",
     fontSize: 20,
+    fontWeight: "bold",
+  },
+  thankYouHeader: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "red",
+    padding: 16,
+    flexDirection: "row", // Aligns children (text and button) in a row
+    justifyContent: "space-between", // Puts space between the text and the button
+    alignItems: "center", // Centers items vertically
+  },
+  thankYouHeaderText: {
+    color: "white",
+    fontSize: 24,
     fontWeight: "bold",
   },
 });

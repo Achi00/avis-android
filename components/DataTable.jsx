@@ -157,6 +157,18 @@ const DataTable = () => {
 export default DataTable;
 
 const ThankYouModal = ({ visible, onClose }) => {
+  // useEffect(() => {
+  //   let timer;
+  //   if (visible) {
+  //     // Set a timer for 5 seconds
+  //     timer = setTimeout(() => {
+  //       onClose(); // Call the onClose function after 5 seconds
+  //     }, 5000);
+  //   }
+
+  //   // Clean up the timer if the component unmounts or if visible changes
+  //   return () => clearTimeout(timer);
+  // }, [visible, onClose]);
   return (
     <SafeAreaView>
       <Modal
@@ -167,12 +179,18 @@ const ThankYouModal = ({ visible, onClose }) => {
       >
         <View style={thankYouStyles.centeredView}>
           <View style={thankYouStyles.thankYouModal}>
+            <View style={thankYouStyles.thankYouHeader}>
+              <Text style={thankYouStyles.thankYouHeaderText}>AVIS</Text>
+              <TouchableOpacity onPress={onClose}>
+                <Text style={thankYouStyles.thankYouButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
               style={thankYouStyles.thankYouModal}
               onPress={onClose}
               activeOpacity={1}
             >
-              <Text style={thankYouStyles.thankYouText}>Thank You!</Text>
+              <Text style={thankYouStyles.thankYouText}>Thank You</Text>
               <TouchableOpacity
                 style={thankYouStyles.thankYouButton}
                 onPress={onClose}
